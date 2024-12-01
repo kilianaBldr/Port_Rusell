@@ -1,0 +1,132 @@
+<div>
+  <h2>Mettre à jour un Utilisateur</h2>
+  <form id="updateUserForm">
+    <!-- Liste déroulante pour sélectionner l'utilisateur à mettre à jour-->
+    <label for="updateUserId">Sélectionnez l'utilisateur à mettre à jour :</label>
+    <select id="updateUserId" name="updateUserId" required>
+      <option value="" disabled selected>Sélectionnez un utilisateur</option>
+    </select>
+    <br /><br />
+
+    <!-- Autres champs de formulaire -->
+    <label for="updateName">Nom:</label>
+    <input type="text" id="updateName" name="updateName" required /><br /><br />
+
+    <label for="updateEmail">Email:</label>
+    <input type="email" id="updateEmail" name="updateEmail" required /><br /><br />
+
+    <label for="updatePassword">Mot de passe:</label>
+    <input type="password" id="updatePassword" name="updatePassword" /><br /><br />
+
+    <button type="submit" id="submitBtn" disabled>Mettre à jour l'utilisateur</button>
+  </form>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+   // Récupére et rempli la liste déroulante de l'utilisateur
+    async function populateUserSelect() {
+      try {
+        const response = await fetch("/users");
+
+        if (!response.ok) {
+          throw new Error(`HTTP erreur! Status: ${response.status}`);
+        }
+
+        const users = await response.json();
+        const selectElement = document.getElementById("updateUserId");
+        selectElement.innerHTML = "<option value='' disabled selected>Select a user</option>";
+
+        users.forEach(user => {
+          const option = document.createElement("option");
+          option.value = user._id;
+          option.textContent = `${user.name} (${user.email})`;
+          selectElement.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Erreur lors de la récupération des utilisateurs:", error.message);
+        alert("Erreur lors de la récupération des utilisateurs");
+      }
+    }
+
+   // Récupére et rempli le formulaire avec les données de l'utilisateur sélectionné
+    async function populateUserForm(userId) {
+      try {
+        const response = await fetch(`/users/${userId}`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP erreur! Status: ${response.status}`);
+        }
+
+        const user = await response.json();
+        document.getElementById("updateName").value = user.name;
+        document.getElementById("updateEmail").value = user.email;
+        document.getElementById("updatePassword").value = ""; // Efface le champ du mot de passe
+      } catch (error) {
+        console.error("Erreur lors de la récupération des informations utilisateur:", error.message);
+        alert("Erreur lors de la récupération des informations utilisateur");
+      }
+    }
+
+    //Rempli la liste déroulante et configure les écouteurs d'événements
+    populateUserSelect();
+
+    document.getElementById("updateUserId").addEventListener("change", function (event) {
+      const userId = event.target.value;
+      if (userId) {
+        populateUserForm(userId);
+        document.getElementById("submitBtn").disabled = false; // Active le bouton Soumettre lorsqu'un utilisateur est sélectionné
+      } else {
+        document.getElementById("submitBtn").disabled = true; //Désactiver le bouton Soumettre si aucun utilisateur n'est sélectionné
+      }
+    });
+
+    // Gére la soumission du formulaire
+    document.getElementById("updateUserForm").addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const userId = document.getElementById("updateUserId").value;
+      const name = document.getElementById("updateName").value;
+      const email = document.getElementById("updateEmail").value;
+      const password = document.getElementById("updatePassword").value;
+
+      if (!userId) {
+        alert("Veuillez sélectionner un utilisateur");
+        return;
+      }
+
+      if (!name || !email) {
+        alert("Veuillez fournir à la fois le nom et l'adresse e-mail");
+        return;
+      }
+
+      const updatedData = { name, email };
+      if (password) {
+        updatedData.password = password;
+      }
+
+      try {
+        const response = await fetch(`/users/${userId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedData),
+        });
+
+        if (response.ok) {
+          const updatedUser = await response.json();
+          console.log("Mise à jour par l'utilisateur :", updatedUser);
+          alert("Utilisateur mis à jour avec succès !");
+          window.location.reload(); // Recharge pour affichés les modifications
+        } else {
+          const error = await response.json();
+          throw new Error(error.message || "Erreur lors de la mise à jour de l'utilisateur");
+        }
+      } catch (error) {
+        console.error("Erreur:", error);
+        alert("Erreur lors de la mise à jour de l'utilisateur : " + error.message);
+      }
+    });
+  });
+</script>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connexion</title>
+  </head>
+  <body>
+    <div>
+      <h1>Se Connecter</h1>
+      <!-- Formulaire de connexion pour l'authentification de l'utilisateur -->
+      <form id="loginForm">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required />
+        <br />
+        <label for="password">Mot de passe:</label>
+        <input type="password" id="password" name="password" required />
+        <br />
+
+        <button type="submit">Connexion</button>
+      </form>
+    </div>
+
+       <!-- Section offrant une vue d'ensemble de l'application -->
+    <section>
+      <h2>Présentation de l'Application</h2>
+      <p>
+        Cette application permet de gérer les utilisateurs, les passerelles et leurs
+        réservations. Elle est conçue pour simplifier le processus de création,
+        de suppression et d'affichage des données tout en offrant une interface conviviale.
+      </p>
+
+      <h3>Architecture</h3>
+      <ul>
+        <li>
+          <strong>Backend:</strong>utilise Node.js avec Express pour la gestion des
+          routes et les opérations CRUD.
+        </li>
+        <li><strong>Database:</strong> MongoDB pour le stockage des données.</li>
+        <li>
+          <strong>Frontend:</strong>  HTML et JavaScript pour créer
+          des formulaires interactifs et gérer les données via des appels API.
+        </li>
+      </ul>
+      <a href="/docs">Documentation de l’API</a>
+
+    </section>
+
+    <script>
+      // Ecouteur d'evenement pour la soumission du formulaire
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (event) {
+          // empeche le comportement de soumission du formuaire par defaut
+          event.preventDefault();
+
+          // Recupère les valeurs dees champs du formulaire
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          try {
+            // Effectuer une requete POST au point de terminaison d'authentification
+            const response = await fetch("/users/authenticate", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ email, password }),
+            });
+
+            // vérifie si la reponse est réussie
+            if (response.ok) {
+              // Analyse la réponse JSON pour obtenir le jeton d'authentification
+              const data = await response.json();
+              const token = data.token;
+
+              // Stocke le jeton dans un cookie avec des attributs de sécurité
+              document.cookie = `accessToken=${token}; max-age=3600; Secure; SameSite=Strict`;
+
+              // redirige l'utilisateur vers ka page du tableau de bord
+              window.location.href = "/dashboard";
+            } else {
+              // Gere les erreurs renvoyées par le serveur 
+              const error = await response.json();
+              console.error("Erreur de connexion:", error);
+              alert("Erreur de connexion: " + error.message);
+            }
+          } catch (error) {
+            // Gere les erreurs résau ou autres connexion
+            console.error("Erreur de connexion:", error);
+            alert("Erreur de connexion: " + error.message);
+          }
+        });
+    </script>
+  </body>
+</html>

@@ -1,27 +1,27 @@
 const Reservation = require("../models/reservation");
 
 /**
- * Get all reservations for a specific catway by its ID.
- *
- * @param {string} catwayId - The ID of the catway.
- * @returns {Promise<Array>} - A promise that resolves to an array of reservations.
+ * Obtenez toutes les réservations pour un Catway spécifique par son ID.
+ * @param {string} catwayId - L'ID du Catway
+ * @returns {Promise<Array>} - 
+ *Une promesse qui se résout en une série de réserves.
  */
 exports.getResByCatwayId = async (catwayId) => {
   try {
     const reservations = await Reservation.find({ catwayId });
     return reservations;
   } catch (error) {
-    console.error("Error in getResByCatwayId:", error);
-    throw new Error("Failed to get reservations by catway ID");
+    console.error("Erreur dans getResByCatwayId:", error);
+    throw new Error("Impossible d'obtenir des réservations par ID du Catway");
   }
 };
 
 /**
- * Get a single reservation by its ID and catway ID.
- *
- * @param {string} catwayId - The ID of the catway.
- * @param {string} reservationId - The ID of the reservation.
- * @returns {Promise<Object|null>} - A promise that resolves to the reservation or null if not found.
+ * * Obtenez une réservation unique par son identifiant et son identifiant du Catway.
+ * @param {string} catwayId - L'ID du Catway.
+ * @param {string} reservationId - L'ID de la réservation.
+ * @returns {Promise<Object|null>} - 
+ * Une promesse qui résout la réservation ou est nulle si elle n'est pas trouvée.
  */
 exports.getResByCatwayAndId = async (catwayId, reservationId) => {
   try {
@@ -31,20 +31,20 @@ exports.getResByCatwayAndId = async (catwayId, reservationId) => {
     });
     return reservation;
   } catch (error) {
-    console.error("Error in getResByCatwayAndId:", error);
-    throw new Error("Failed to get reservation by catway ID and reservation ID");
+    console.error("Erreur dans getResByCatwayAndId:", error);
+    throw new Error("Impossible d'obtenir la réservation par l'ID du Catway et l'ID de réservation");
   }
 };
 
 /**
- * Create a new reservation for a specific catway.
- *
- * @param {string} catwayId - The ID of the catway.
+ * Créez une nouvelle réservation pour un Catway spécifique.
+ * @param {string} catwayId - L'ID du Catway .
  * @param {string} clientName - The name of the client.
- * @param {Date} checking - The check-in date.
- * @param {Date} checkout - The check-out date.
- * @param {string} boatName - The name of the client's boat.
- * @returns {Promise<Object>} - A promise that resolves to the newly created reservation.
+ * @param {Date} checking - La date d'arrivée.
+ * @param {Date} checkout - La date de départ.
+ * @param {string} boatName - Le nom du bateau du client.
+ * @returns {Promise<Object>} - 
+ * Une promesse qui se résout à la réservation nouvellement créée.
  */
 exports.createReservation = async (
   catwayId,
@@ -64,17 +64,17 @@ exports.createReservation = async (
     await newReservation.save();
     return newReservation;
   } catch (error) {
-    console.error("Error in createReservation:", error);
-    throw new Error("Failed to create reservation");
+    console.error("Erreur dans createReservation:", error);
+    throw new Error("Échec de la création de la réservation");
   }
 };
 
 /**
- * Delete a reservation by its ID and catway ID.
- *
- * @param {string} catwayId - The ID of the catway.
- * @param {string} reservationId - The ID of the reservation.
- * @returns {Promise<Object>} - A promise that resolves to the result of the deletion.
+ *Supprimer une réservation par son ID et son ID de Catway.
+ * @param {string} catwayId - L'ID du Catway
+ * @param {string} reservationId -L'ID de la réservation.
+ * @returns {Promise<Object>} - 
+ *Une promesse qui résout le résultat de la suppression.
  */
 exports.deleteResByCatwayAndId = async (catwayId, reservationId) => {
   try {
@@ -83,11 +83,11 @@ exports.deleteResByCatwayAndId = async (catwayId, reservationId) => {
       catwayId,
     });
     if (result.deletedCount === 0) {
-      throw new Error("No reservation found to delete");
+      throw new Error("Aucune réservation trouvée à supprimer");
     }
     return result;
   } catch (error) {
-    console.error("Error in deleteResByCatwayAndId:", error);
-    throw new Error("Failed to delete reservation by catway ID and reservation ID");
+    console.error("Erreur dans deleteResByCatwayAndId:", error);
+    throw new Error("Échec de la suppression de la réservation par l'Id du Catway et l'Id de réservation");
   }
 };

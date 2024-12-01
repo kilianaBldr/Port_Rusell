@@ -1,0 +1,106 @@
+<div>
+  <h2>Supprimer l'utilisateur</h2>
+
+  <!-- Formulaire de suppression d'un utilisateur -->
+  <form id="deleteUserForm">
+    <!--Liste déroulante pour sélectionner l'utilisateur à supprimer -->
+    <label for="deleteUserId">Sélectionnez l'utilisateur à supprimer :</label>
+    <select id="deleteUserId" name="deleteUserId" required>
+    </select>
+    <br /><br />
+
+    <button type="submit">Supprimer l'utilisateur</button>
+  </form>
+</div>
+
+<script>
+  /**
+  * Renseigne la liste déroulante des utilisateurs avec les options du serveur.
+  * Récupère les utilisateurs et met à jour l'élément de liste déroulante.
+  */
+  async function populateUserSelect() {
+    try {
+      // Récupére la liste des utilisateurs du serveur
+      const response = await fetch("/users");
+
+      // Vérifiez si la réponse a réussi
+      if (!response.ok) {
+        throw new Error(`HTTP erreur! Status: ${response.status}`);
+      }
+
+      // Analyse la réponse JSON
+      const users = await response.json();
+
+      // Obtien l'élément déroulant
+      const selectElement = document.getElementById("deleteUserId");
+
+      //Efface les options existantes
+      selectElement.innerHTML = "<option value='' disabled selected>Select a user</option>";
+
+      //Remplis la liste déroulante avec les options utilisateur
+      users.forEach((user) => {
+        const option = document.createElement("option");
+        option.value = user._id;
+        option.textContent = `${user.name} (${user.email})`;
+        selectElement.appendChild(option);
+      });
+    } catch (error) {
+     //Alerter en cas d'erreur
+      console.error("Erreur lors de la récupération des utilisateurs :", error.message);
+      alert("Erreur lors de la récupération des utilisateurs");
+    }
+  }
+
+  // Remplir la liste déroulante de l'utilisateur lorsque la page est chargée
+  document.addEventListener("DOMContentLoaded", populateUserSelect);
+
+  /**
+  * Gère la soumission du formulaire pour supprimer un utilisateur.
+  * Envoie une requête DELETE au serveur et gère la réponse.
+  */
+  document
+    .getElementById("deleteUserForm")
+    .addEventListener("submit", async function (event) {
+      event.preventDefault(); // Empêche la soumission du formulaire par défaut
+
+      //Obtenez l'ID utilisateur sélectionné dans la liste déroulante
+      const userId = document.getElementById("deleteUserId").value;
+
+      // Vérifiez si un identifiant d'utilisateur est sélectionné
+      if (!userId) {
+        alert("Veuillez sélectionner un utilisateur");
+        return;
+      }
+
+      try {
+        // Envoi une requête DELETE au serveur
+        const response = await fetch(`/users/${userId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        // Vérifiez si la réponse a réussi
+        if (response.ok) {
+          // Analyser la réponse JSON
+          const deletedUser = await response.json();
+          console.log("Utilisateur supprimé :", deletedUser);
+
+          //Notifie l'utilisateur de la suppression réussie
+          alert("Utilisateur supprimé avec succès !");
+
+          // Actualise la liste déroulante des utilisateurs
+          populateUserSelect();
+        } else {
+          // // Analyse et génére une erreur si la réponse n'est pas correcte
+          const error = await response.json();
+          throw new Error(error.message || "Erreur lors de la suppression de l'utilisateur");
+        }
+      } catch (error) {
+        // Journaliser et alerter en cas d'erreur
+        console.error("Erreur:", error);
+        alert("Erreur lors de la suppression de l'utilisateur : " + error.message);
+      }
+    });
+</script>

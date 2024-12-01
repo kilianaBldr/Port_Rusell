@@ -4,65 +4,65 @@ const reservationService = require("../services/reservation");
 const Reservations = require("../models/reservation");
 const private = require("../middlewares/private");
 
-// Route to render all reservations in a view
+// Routepour rendre toutes les réservations dans une vue
 router.get("/view", private.checkJWT, async (req, res) => {
   try {
-    // Fetch all reservations from the database
+    // Récupere toutes les réservations de la base de données
     const reservations = await Reservations.find();
-    // Render the 'reservations_view' template with the reservations data 
+    // rendre le modele "réservations" de Views avec les données de réservations
     res.render("reservations", { reservations });
   } catch (err) {
-    console.error("Error in getAllReservations:", err.message);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Erreur dans getAllReservations:", err.message);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 
-// Route to get all reservations as JSON
+// Route pour obtenir toutes les réservation au format JSON
 router.get("/", private.checkJWT, async (req, res) => {
   try {
-    // Fetch all reservations from the database
+    // Récupere toutes les réservationsde la base de données
     const reservations = await Reservations.find();
-    // Send the reservations data as JSON
+    // Envoie les données de réservationau format JSON
     res.json(reservations);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Route to get a reservation by ID
+// Route pour obtenir une réservation par son ID
 router.get("/:id", private.checkJWT, async (req, res) => {
   const reservationId = req.params.id;
 
   try {
-    // Fetch a specific reservation by its ID from the database
+    // Récupère une réservation spécifique par son ID à partir de la base de données
     const reservation = await Reservations.findById(reservationId);
     if (!reservation) {
       return res.status(404).json({ error: "Reservation not found" });
     }
-    // Send the reservation data as JSON
+    // Envoie les données de réservation au format JSON
     res.json(reservation);
   } catch (error) {
-    console.error("Error fetching reservation details:", error.message);
-    res.status(500).json({ error: "Error fetching reservation details" });
+    console.error("Erreur lors de la récupération des détails de la réservation:", error.message);
+    res.status(500).json({ error: "Erreur lors de la récupération des détails de la réservation" });
   }
 });
 
-// Route to get all reservations for a specific catway
+// Route pour obtenir toutes les réservations réaliser par un Catway spécifique
 router.get("/:id/reservations", private.checkJWT, async (req, res) => {
   const catwayId = req.params.id;
 
   try {
-    // Fetch reservations for a specific catway using the service layer
+    // Recupère les réservations d'un Catway spécifique à l'aide du service
     const reservations = await reservationService.getResByCatwayId(catwayId);
-    // Send the reservations data as JSON
+    // Envoie les données de réservation au format JSON
     res.status(200).json(reservations);
   } catch (error) {
-    console.error("Error fetching reservations:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("Erreur lors de la récupération des réservations:", error);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 
-// Route to get a specific reservation for a specific catway
+// Route pour obtenir une réservation spécifique pour un catway spécifique
 router.get(
   "/:id/reservations/:idReservation",
   private.checkJWT,
@@ -71,34 +71,34 @@ router.get(
     const reservationId = req.params.idReservation;
 
     try {
-      // Fetch a specific reservation for a specific catway using the service layer
+      // Récupere une réservation spécifique pour un Catway spécifique a l'aide du service
       const reservation = await reservationService.getResByCatwayAndId(
         catwayId,
         reservationId
       );
 
       if (reservation) {
-        // Send the reservation data as JSON
+        // Envoie les données au format JSON
         res.status(200).json(reservation);
       } else {
         res
           .status(404)
-          .json({ error: "Reservation not found for this catway" });
+          .json({ error: "Reservation non trouvée pour ce Catway" });
       }
     } catch (error) {
-      console.error("Error fetching reservation:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      console.error("Erreur lors de la récupération de la réservation:", error);
+      res.status(500).json({ error: "Erreur interne du serveur" });
     }
   }
 );
 
-// Route to create a new reservation for a specific catway
+// Route pour créer un nouvelle réservation pour un Catway spécifique
 router.post("/:id/reservations", private.checkJWT, async (req, res) => {
   const catwayId = req.params.id;
   const { clientName, checking, checkout, boatName } = req.body;
 
   try {
-    // Create a new reservation using the service layer
+    // Créer une nouvelle réservation en utilsant le service
     const newReservation = await reservationService.createReservation(
       catwayId,
       clientName,
@@ -106,15 +106,15 @@ router.post("/:id/reservations", private.checkJWT, async (req, res) => {
       checkout,
       boatName
     );
-    // Send the newly created reservation as JSON
+    // Envoye la nouvelle réservation qui vien d'être créer au format JSON
     res.status(201).json(newReservation);
   } catch (error) {
-    console.error("Error creating reservation:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("Erreur lors de la création de la reservation:", error);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 
-// Route to delete a specific reservation for a specific catway
+// Route pour supprimer une réservation spécifique pour un Catway spécifique
 router.delete(
   "/:id/reservations/:idReservation",
   private.checkJWT,
@@ -123,44 +123,44 @@ router.delete(
     const reservationId = req.params.idReservation;
 
     try {
-      // Delete a specific reservation for a specific catway using the service layer
+      //  Supprimer une réservation spécifique pour un Catway spécifique à l'aide du service
       const result = await reservationService.deleteResByCatwayAndId(
         catwayId,
         reservationId
       );
 
       if (result.deletedCount === 1) {
-        // Send a success message if the reservation was deleted
-        res.status(200).json({ message: "Reservation deleted successfully" });
+        //  envoie une réponse de réussite si la réservation a été supprimée
+        res.status(200).json({ message: "Reservation supprimée avec succès" });
       } else {
         res
           .status(404)
-          .json({ error: "Reservation not found for this catway" });
+          .json({ error: "Reservation non trouvée pour ce Catway" });
       }
     } catch (error) {
-      console.error("Error deleting reservation:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      console.error("Erreur lors de la suppression de la réservation:", error);
+      res.status(500).json({ error: "Erreur interne du serveur" });
     }
   }
 );
 
-// Route to render reservation details in a view
+// Route pour afficher les détails de la réservation dans une Vue
 router.get("/view/:id", async (req, res) => {
   const reservationId = req.params.id;
 
   try {
-    // Fetch reservation details by ID from the database
+    // Récupere les détails de la réservation par son ID à partir de la base de données 
     const reservation = await Reservations.findById(reservationId);
 
     if (!reservation) {
-      return res.status(404).json({ error: "Reservation not found" });
+      return res.status(404).json({ error: "Reservation non trouvée" });
     }
 
-    // Render the 'reservation_detail_view' template with the reservation data
+    // Rend le modèle 'reservation' avec les données de réservation
     res.render("reservationDetail", { reservation });
   } catch (err) {
-    console.error("Error in getReservationDetails:", err.message);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Erreur dans getReservationDetails:", err.message);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 

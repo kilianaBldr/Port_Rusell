@@ -1,0 +1,113 @@
+<div>
+    <h2>Supprimer un Catway</h2>
+    <!-- Formulaire pour supprimer un Catway -->
+    <form id="deleteCatwayForm">
+     
+      <label for="deleteCatwayId">Selectionné un Catway number:</label>
+      <select id="deleteCatwayId" name="deleteCatwayId" required>
+        <option value="" disabled selected>Selectionné un Catway</option>
+      </select>
+      <br /><br />
+      <button type="submit" id="submitDeleteButton" disabled>Supprimer Catway</button>
+    </form>
+  
+    <!-- Message -->
+    <div id="messageArea" style="margin-top: 20px; color: green;"></div>
+    <div id="errorMessageArea" style="margin-top: 20px; color: red;"></div>
+  </div>
+  
+  <script>
+     /**
+    * Gère la soumission du formulaire pour supprimer un Catway.
+    * Empêche le comportement par défaut et envoie une requête DELETE au serveur.
+    */
+    document.getElementById("deleteCatwayForm").addEventListener("submit", async function (event) {
+      event.preventDefault(); // Empêche la soumission du formulaire par défaut
+  
+      const deleteCatwayId = document.getElementById("deleteCatwayId").value;
+  
+      if (!deleteCatwayId) {
+        showError("Veuillez sélectionner un Catway à supprimer.");
+        return;
+      }
+  
+      // Confirmation avant la suppression
+      const confirmDeletion = confirm("Etes-vous sûr de vouloir supprimer ce Catway ?");
+      if (!confirmDeletion) {
+        return; //Si l'utilisateur annule, quitte
+      }
+  
+      try {
+        // Envoyer une requête DELETE au serveur pour supprimer le Catway sélectionnée
+        const response = await fetch(`/catways/${deleteCatwayId}`, {
+          method: "DELETE",
+        });
+  
+        if (!response.ok) {
+          throw new Error("Impossible de supprimer le Catway");
+        }
+  
+        const result = await response.json();
+        console.log(result);// Résultat de la console pour le débogage
+        showSuccess("Catway supprimé avec succès");
+  
+        // Actualiser la liste déroulante avec les numéros de catway mis à jour
+        fetchCatwayNumbers();
+      } catch (error) {
+        console.error("Erreur lors de la suppression du Catway :", error.message);
+        showError("Erreur lors de la suppression du Catway : " + error.message);
+      }
+    });
+  
+    /**
+    * Récupère les numéros de Catway à partir du serveur et remplit la liste déroulante de sélection.
+    */
+    async function fetchCatwayNumbers() {
+      try {
+        const response = await fetch("/catways/catwayNumbers");
+        if (!response.ok) {
+          throw new Error("Impossible de récupérer les numéros de Catway");
+        }
+  
+        const catways = await response.json();
+        const selectElement = document.getElementById("deleteCatwayId");
+  
+        // Effacer les options existantes
+        selectElement.innerHTML = '<option value="" disabled selected>Select a Catway</option>';
+  
+        // Remplissez la liste déroulante avec les numéros de Catway
+        catways.forEach((catway) => {
+          const option = document.createElement("option");
+          option.value = catway._id;
+          option.textContent = catway.catwayNumber;
+          selectElement.appendChild(option);
+        });
+  
+        // Activer le bouton Soumettre s'il existe un catway valide à sélectionner
+        document.getElementById("submitDeleteButton").disabled = catways.length === 0;
+  
+      } catch (error) {
+        console.error("Erreur lors de la récupération des numéros de Catway:", error.message);
+        showError("Erreur lors de la récupération des numéros de Catway: " + error.message);
+      }
+    }
+  
+   // Récupérer les numéros de Catway lorsque la page se charge
+    fetchCatwayNumbers();
+  
+    // Fonction pour afficher un message de réussite
+    function showSuccess(message) {
+      const messageArea = document.getElementById("messageArea");
+      messageArea.textContent = message;
+      messageArea.style.color = "green";
+      document.getElementById("errorMessageArea").textContent = ""; // Effacer tout message d'erreur précédent
+    }
+  
+    // Fonction pour afficher un message d'erreur
+    function showError(message) {
+      const errorMessageArea = document.getElementById("errorMessageArea");
+      errorMessageArea.textContent = message;
+      errorMessageArea.style.color = "red";
+      document.getElementById("messageArea").textContent = ""; // Effacer tout message de réussite précédent
+    }
+  </script>

@@ -4,61 +4,61 @@ const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = process.env;
 
 /**
- * Get all users, excluding their passwords.
- *
- * @returns {Promise<Array>} - A promise that resolves to an array of user objects.
+ * Obtenez tous les utilisateurs, à l'exclusion de leurs mots de passe.
+ * @returns {Promise<Array>} - 
+ * Une promesse qui se résout en un tableau d’objets utilisateur.
  */
 exports.getAllUsers = async () => {
   try {
     return await User.find({}, "-password");
   } catch (error) {
-    console.error("Error in getAllUsers:", error);
-    throw new Error("Error retrieving users");
+    console.error("Erreur dans getAllUsers:", error);
+    throw new Error("Erreur lors de la récupération des utilisateurs");
   }
 };
 
 /**
- * Get a user by their ID.
- *
- * @param {string} id - The ID of the user.
- * @returns {Promise<Object|null>} - A promise that resolves to the user object or null if not found.
+ * Obtenir un utilisateur par son identifiant.
+ * @param {string} id - L'ID de l'utilisateur.
+ * @returns {Promise<Object|null>} - 
+ * Une promesse qui se résout en objet utilisateur ou null si elle n'est pas trouvée.
  */
 exports.getUserById = async (id) => {
   try {
     return await User.findById(id);
   } catch (error) {
-    console.error("Error in getUserById:", error);
-    throw new Error("Error retrieving user");
+    console.error("Erreur dans getUserById:", error);
+    throw new Error("Erreur lors de la récupération de l'utilisateur");
   }
 };
 
 /**
- * Create a new user.
- *
- * @param {Object} userData - The data for the new user.
- * @returns {Promise<Object>} - A promise that resolves to the created user object.
+ * Créer un nouvel utilisateur.
+ * @param {Object} userData -Les données du nouvel utilisateur.
+ * @returns {Promise<Object>} - 
+ * Une promesse qui se résout en l’objet utilisateur créé.
  */
 exports.addUser = async (userData) => {
   try {
     return await User.create(userData);
   } catch (error) {
-    console.error("Error in addUser:", error);
-    throw new Error("Error creating user");
+    console.error("Erreur dans addUser:", error);
+    throw new Error("Erreur lors de la création de l'utilisateur");
   }
 };
 
 /**
- * Update a user by their ID.
- *
- * @param {string} id - The ID of the user.
- * @param {Object} userData - The updated data for the user.
- * @returns {Promise<Object>} - A promise that resolves to the updated user object.
+ *Mettre à jour un utilisateur par son ID.
+ * @param {string} id -L'ID de l'utilisateur.
+ * @param {Object} userData - Les données mises à jour pour l'utilisateur.
+ * @returns {Promise<Object>} - 
+ * Les données mises à jour pour l'utilisateur.
  */
 exports.updateUserById = async (id, userData) => {
   try {
     const user = await User.findById(id);
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("Utilisateur non trouvé");
     }
 
     Object.keys(userData).forEach((key) => {
@@ -70,37 +70,37 @@ exports.updateUserById = async (id, userData) => {
     await user.save();
     return user;
   } catch (error) {
-    console.error("Error in updateUserById:", error);
+    console.error("Erreur dans updateUserById:", error);
     throw error;
   }
 };
 
 /**
- * Delete a user by their ID.
- *
- * @param {string} id - The ID of the user.
- * @returns {Promise<Object>} - A promise that resolves to a message confirming deletion.
+ *Supprimer un utilisateur par son ID.
+ * @param {string} id -L'ID de l'utilisateur.
+ * @returns {Promise<Object>} - 
+ *Une promesse qui se résout en un message confirmant la suppression.
  */
 exports.deleteUserById = async (id) => {
   try {
     const user = await User.findById(id);
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("Utilisateur non trouvé");
     }
     await User.deleteOne({ _id: id });
-    return { message: "User deleted successfully" };
+    return { message: "L'utilisateur a été supprimé avec succès" };
   } catch (error) {
-    console.error("Error in deleteUserById:", error);
+    console.error("Erreur dans deleteUserById:", error);
     throw error;
   }
 };
 
 /**
- * Authenticate a user by their email and password.
- *
- * @param {string} email - The user's email address.
- * @param {string} password - The user's password.
- * @returns {Promise<Object>} - A promise that resolves to an object containing a JWT token.
+ * Authentifier un utilisateur par son email et son mot de passe.
+ * @param {string} email - L'adresse e-mail de l'utilisateur.
+ * @param {string} password - le mot de passe de l'utilisateur.
+ * @returns {Promise<Object>} - 
+ *Une promesse qui se résout en un objet contenant un jeton JWT.
  */
 exports.authenticateUser = async (email, password) => {
   try {
@@ -108,12 +108,12 @@ exports.authenticateUser = async (email, password) => {
       "-__v -createdAt -updatedAt"
     );
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("Utilisateur non trouvé");
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      throw new Error("Wrong credentials");
+      throw new Error("Mauvaises informations d'identification");
     }
 
     const { password: userPassword, ...userWithoutPassword } = user.toObject();
@@ -124,7 +124,7 @@ exports.authenticateUser = async (email, password) => {
 
     return { token };
   } catch (error) {
-    console.error("Authentication error:", error);
+    console.error("Erreur d'authentification :", error);
     throw error;
   }
 };

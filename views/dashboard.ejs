@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tebleau de bord - Capitainerie</title>
+
+</head>
+<body>
+    <h1>Tableau de bord</h1>
+
+    <section>
+        <h2>Gestion des utilisateurs</h2>
+        <!-- Include formulaire création d'utilisateur -->
+        <%- include('./forms/user/createUser.ejs') %> 
+        <!-- Include formulaire mise à jour utilisateur -->
+        <%- include('./forms/user/updateUser.ejs') %> 
+        <!-- Include formulaire suppression d'utilisateur -->
+        <%- include('./forms/user/deleteUser.ejs') %> 
+    </section>
+
+    <section>
+        <h2>Gestion des Cawtays</h2>
+        <!-- Include formulaire création de Catway -->
+        <%- include('./forms/catway/createCatway.ejs') %> 
+        <!-- Include formulaire mise à jour état du Catway -->
+        <%- include('./forms/catway/updateCatwayState.ejs') %> 
+        <!-- Include formulaire suppression de Catway -->
+        <%- include('./forms/catway/deleteCatway.ejs') %> 
+        <!-- Include formulaire détail de Catway -->
+        <%- include('./forms/catway/detailCatway.ejs') %> 
+
+        <p><a href="/catways/view">Voir la liste des Catways</a></p>
+    </section>
+
+    <section>
+        <h2>Gestion des Réservations</h2>
+        <!-- Include formulaire création de réservation -->
+        <%- include('./forms/reservation/createReservation.ejs') %> 
+        <!-- Include formulaire suppression de réservation -->
+        <%- include('./forms/reservation/deleteReservation.ejs') %> 
+        <!-- Include formulaire détail de réservation -->
+    <%- include('./forms/reservation/detailReservation.ejs') %> 
+
+      <p><a href="/reservations/view">Voir la liste des réservations</a></p>
+    </section>
+
+    </section>
+
+    <button onclick="logout()">Déconnexion</button>
+
+    <script>
+        //Fonction logout pour supprimer le cookies et rediriger vers la page d'accueil
+        function logout() {
+            //Supprime le cookies "accessToken"
+            document.cookie = "accessToken=; max-age=0; expires=Thu; 01 Jan 1980 00:00:00 GMT; Secure; SameSite=Strict" 
+
+            //redirige l'utilisateur vers la page d'accueil apres la deconnexion
+            window.location.href = "/";
+        }
+    </script>
+</body>
+</html>

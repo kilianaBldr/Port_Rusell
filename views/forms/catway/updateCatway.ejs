@@ -1,0 +1,152 @@
+<div>
+    <h2>Mettre à jour l'état de Catway</h2>
+    <!-- Form to update the catway state -->
+    <form id="updateCatwayForm">
+      <!-- Dropdown to select catway number -->
+      <label for="updateCatwayId">Selectionné un Catway number:</label>
+      <select id="updateCatwayId" name="updateCatwayId" required>
+        <option value="" disabled selected>Selectionné un Catway</option>
+      </select>
+      <br /><br />
+  
+      <label for="updateCatwayState">Nouvel état du Catway :</label>
+      <input
+        type="text"
+        id="updateCatwayState"
+        name="updateCatwayState"
+        required
+      />
+      <br /><br />
+  
+      <button type="submit">Mettre à jour l'état de Catway</button>
+    </form>
+  
+    <!-- Zone de message pour le chargement, la réussite ou l'erreur -->
+    <div id="loadingMessage" style="color: blue; margin-top: 10px;"></div>
+    <div id="errorMessage" style="color: red; margin-top: 10px;"></div>
+    <div id="successMessage" style="color: green; margin-top: 10px;"></div>
+  </div>
+  
+  <script>
+    // Ajouter un écouteur d'événement au formulaire pour gérer la soumission du formulaire
+    document
+      .getElementById("updateCatwayForm")
+      .addEventListener("submit", async function (event) {
+        event.preventDefault();// Empêcher le comportement de soumission de formulaire par défaut
+  
+        // Obtenir l'ID du Catway sélectionné et le nouvel état du Catway à partir du formulaire
+        const updateCatwayId = document.getElementById("updateCatwayId").value;
+        const updateCatwayState = document
+          .getElementById("updateCatwayState")
+          .value.trim();
+  
+        // Valider l'entrée
+        if (!updateCatwayState) {
+          showError("L'état Catway ne peut pas être vide.");
+          return;
+        }
+  
+        showLoadingMessage("Mise à jour de l'état du catway..."); // Afficher le message de chargement
+  
+        try {
+         // Envoyer une requête PATCH au serveur pour mettre à jour l'état du catway
+          const response = await fetch(`/catways/${updateCatwayId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ catwayState: updateCatwayState }),
+          });
+  
+          // Vérifiez si la réponse n'est pas OK
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Échec de la mise à jour de l'état de Catway");
+          }
+  
+          // Analyser la réponse du serveur
+          const result = await response.json();
+          showSuccess("Catway State mis à jour avec succès!");
+          resetForm(); // Réinitialiser les champs du formulaire
+          fetchCatwayNumbers(); // Actualiser la liste déroulante
+        } catch (error) {
+          // Gérer les erreurs
+          showError("Erreur lors de la mise à jour de l'état de Catway: " + error.message);
+        }
+      });
+  
+    // Fonction permettant de récupérer les numéros de Catway et de remplir la liste déroulante
+    async function fetchCatwayNumbers() {
+      try {
+       // Affiche le message de chargement lors de la récupération des données
+        showLoadingMessage("Récupération des numéros de catway...");
+  
+        // Envoye une requête GET pour récupérer les numéros de catway
+        const response = await fetch("/catways/catwayNumbers");
+        if (!response.ok) throw new Error("Impossible de récupérer les numéros de Catway");
+  
+        // Analyser la réponse du serveur
+        const catways = await response.json();
+        const selectElement = document.getElementById("updateCatwayId");
+        selectElement.innerHTML = '<option value="" disabled selected>Select a Catway</option>';// Assurez-vous que l'espace réservé est préservé
+  
+        // Si aucun catway n'est disponible, affichez un message informatif et désactivez le menu déroulant
+        if (catways.length === 0) {
+          showError("Aucune Catway disponible.");
+          selectElement.disabled = true; // Désactive la liste déroulante s'il n'y a pas de Catway
+          return;
+        }
+  
+        // Activer la liste déroulante si les Catways sont disponibles
+        selectElement.disabled = false;
+  
+        // Remplissez la liste déroulante avec les numéros de Catway
+        catways.forEach((catway) => {
+          const option = document.createElement("option");
+          option.value = catway._id;
+          option.textContent = catway.catwayNumber;
+          selectElement.appendChild(option);
+        });
+  
+        hideLoadingMessage(); // Masquer le message de chargement après la récupération des données
+      } catch (error) {
+        // Gérer les erreurs
+        showError("Erreur lors de la récupération des numéros de passerelle: " + error.message);
+      }
+    }
+  
+    // Fonction pour afficher le message de chargement
+    function showLoadingMessage(message) {
+      const loadingMessage = document.getElementById("loadingMessage");
+      loadingMessage.textContent = message;
+    }
+  
+    // Fonction pour masquer le message de chargement
+    function hideLoadingMessage() {
+      const loadingMessage = document.getElementById("loadingMessage");
+      loadingMessage.textContent = "";
+    }
+  
+    // Fonction pour afficher un message d'erreur
+    function showError(message) {
+      const errorMessage = document.getElementById("errorMessage");
+      errorMessage.textContent = message;
+      hideLoadingMessage(); // Masquer le message de chargement en cas d'erreur
+    }
+  
+    // Fonction pour afficher un message de réussite
+    function showSuccess(message) {
+      const successMessage = document.getElementById("successMessage");
+      successMessage.textContent = message;
+      setTimeout(() => successMessage.textContent = "", 5000); // Effacer après 5 secondes
+      hideLoadingMessage();// Masquer le message de chargement après le succès
+    }
+  
+    // Fonction pour réinitialiser le formulaire
+    function resetForm() {
+      document.getElementById("updateCatwayForm").reset();
+      const errorMessage = document.getElementById("errorMessage");
+      errorMessage.textContent = ""; // Efface le message d'erreur
+    }
+  
+   // Récupére les numéros de Catway lorsque la page se charge
+    fetchCatwayNumbers();
+  </script>

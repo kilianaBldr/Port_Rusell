@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Détails de Catway</title>
+  </head>
+  <body>
+    <h1>Détails de Catway</h1>
+    
+    <!-- Affichage des détails du Catway -->
+    <div>
+      <h2>Numéro de Catway: <%= catway.catwayNumber %></h2>
+      <p><strong>État:</strong> <%= catway.catwayState %></p>
+      <p><strong>Type:</strong> <%= catway.type %></p>
+    </div>
+
+    <!-- Lien pour revenir à la liste des catways -->
+    <a href="/catways/view">Retour à la liste des catways</a>
+  </body>
+</html>

@@ -1,0 +1,138 @@
+<div>
+    <h2>Afficher les détails de la réservation</h2>
+    <!--Formulaire de sélection d'une réservation et d'affichage de ses détails -->
+    <form id="reservationDetailsForm">
+      <!-- Menu déroulant pour sélectionner une réservation-->
+      <label for="detailReservationId">Sélectionnez une réservation :</label><br />
+      <select id="detailReservationId" name="detailReservationId" required>
+        <option value="" disabled selected>Sélectionnez une réservation</option>
+      </select>
+      <br /><br />
+      <button type="submit" id="showDetailsButton" disabled>Afficher les détails</button>
+    </form>
+    <!-- Conteneur pour afficher les détails de la réservation -->
+    <div id="reservationDetails"></div>
+    <!-- Zone de message d'erreur -->
+    <div id="errorMessage" style="color: red; display: none;"></div>
+  </div>
+  
+  <script>
+    // Expression de fonction immédiatement invoquée pour gérer les données de réservation et les interactions des utilisateurs
+    (async function () {
+      // Fonction pour remplir le menu déroulant des réservations
+      async function populateReservationsSelect() {
+        try {
+          // Récupérer les données de réservation depuis le serveur
+          const response = await fetch("/reservations");
+          if (!response.ok) {
+            throw new Error("Impossible de récupérer les réservations");
+          }
+  
+         // Analyser la réponse JSON pour obtenir les données de réservation
+          const reservations = await response.json();
+          const reservationSelect = document.getElementById("detailReservationId");
+  
+         // Efface toutes les options existantes dans la liste déroulante
+          reservationSelect.innerHTML = "";
+  
+          // Ajouter une option d'espace réservé
+          const placeholderOption = document.createElement("option");
+          placeholderOption.value = "";
+          placeholderOption.textContent = "Sélectionnez une réservation";
+          placeholderOption.disabled = true;
+          placeholderOption.selected = true;
+          reservationSelect.appendChild(placeholderOption);
+  
+          // Remplis la liste déroulante avec les options de réservation
+          if (reservations.length === 0) {
+            //Ajoute un message si aucune réservation n'est disponible
+            const noReservationsOption = document.createElement("option");
+            noReservationsOption.textContent = "Aucune réservation disponible";
+            noReservationsOption.disabled = true;
+            reservationSelect.appendChild(noReservationsOption);
+          } else {
+            reservations.forEach((reservation) => {
+              const option = document.createElement("option");
+              option.value = reservation._id;
+              option.textContent = `ID: ${reservation._id} - Client: ${reservation.clientName}`;
+              reservationSelect.appendChild(option);
+            });
+          }
+  
+        // Activer le bouton Afficher les détails si des réservations existent
+          document.getElementById("showDetailsButton").disabled = reservations.length === 0;
+        } catch (error) {
+          console.error("Erreur lors de la récupération des réservations:", error.message);
+          showError("Erreur lors de la récupération des réservations: " + error.message);
+        }
+      }
+  
+     // Fonction permettant d'afficher les détails d'une réservation sélectionnée
+      async function showReservationDetails(detailReservationId) {
+        try {
+         // Récupérer les détails de la réservation sélectionnée
+          const response = await fetch(`/reservations/${detailReservationId}`);
+          if (!response.ok) {
+            throw new Error("Impossible de récupérer les détails de la réservation");
+          }
+  
+          // Analyse la réponse JSON pour obtenir les détails de la réservation
+          const reservation = await response.json();
+          const detailsContainer = document.getElementById("reservationDetails");
+  
+          //Formate les dates pour plus de lisibilité
+          const checkingDate = new Date(reservation.checking).toLocaleDateString("en-GB");
+          const checkoutDate = new Date(reservation.checkout).toLocaleDateString("en-GB");
+  
+          // Génére du HTML pour afficher les détails de la réservation
+          const detailsHTML = `
+            <h3>Détails de la réservation</h3>
+            <table>
+              <tr><td><strong>ID:</strong></td><td>${reservation._id}</td></tr>
+              <tr><td><strong>Client:</strong></td><td>${reservation.clientName}</td></tr>
+              <tr><td><strong>Date d'arrivée:</strong></td><td>${checkingDate}</td></tr>
+              <tr><td><strong>Date de départ:</strong></td><td>${checkoutDate}</td></tr>
+              <tr><td><strong>Nom du bateau:</strong></td><td>${reservation.boatName}</td></tr>
+            </table>
+          `;
+  
+         // Affiche les détails de la réservation dans le conteneur
+          detailsContainer.innerHTML = detailsHTML;
+        } catch (error) {
+          console.error("Erreur lors de la récupération des détails de la réservation:", error.message);
+          showError("Erreur lors de la récupération des détails de la réservation: " + error.message);
+        }
+      }
+  
+      // Affiche un message d'erreur à l'utilisateur
+      function showError(message) {
+        const errorMessageDiv = document.getElementById("errorMessage");
+        errorMessageDiv.textContent = message;
+        errorMessageDiv.style.display = "block";
+      }
+  
+      // Configure un écouteur d'événements pour la soumission du formulaire
+      document.getElementById("reservationDetailsForm").addEventListener("submit", function (event) {
+        // Empêche la soumission du formulaire par défaut
+        event.preventDefault();
+  
+        //Obtien l'ID de réservation sélectionné
+        const detailReservationId = document.getElementById("detailReservationId").value;
+        if (detailReservationId) {
+          // Affiche les détails de la réservation sélectionnée
+          showReservationDetails(detailReservationId);
+        } else {
+          showError("Veuillez sélectionner une réservation.");
+        }
+      });
+  
+     // Activer le bouton « Afficher les détails » lorsqu'une réservation est sélectionnée
+      document.getElementById("detailReservationId").addEventListener("change", function () {
+        const showDetailsButton = document.getElementById("showDetailsButton");
+        showDetailsButton.disabled = !this.value;
+      });
+  
+     // Renseigne la liste déroulante des réservations lors du chargement de la page
+      await populateReservationsSelect();
+    })();
+  </script>

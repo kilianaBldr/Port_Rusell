@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Détails de la réservation</title>
+  </head>
+
+  <body>
+    <h1>Détails de la réservation</h1>
+
+    <!--Affiche l'ID de réservation-->
+    <h2>Reservation ID: <%= reservation._id %></h2>
+    
+    <!-- Énumére les détails de la réservation -->
+    <ul>
+      <li><strong>Nom du client :</strong> <%= reservation.clientName %></li>
+      
+      <!-- Formate et affiche la date d'arrivée -->
+      <li>
+        <strong>Date d'arrivée:</strong> 
+        <%= reservation.checking ? new Date(reservation.checking).toLocaleDateString() : 'Pas disponible' %>
+      </li>
+      
+      <!-- Formate et affiche la date de départ-->
+      <li>
+        <strong>Date de départ :</strong> 
+        <%= reservation.checkout ? new Date(reservation.checkout).toLocaleDateString() : 'Pas disponible' %>
+      </li>
+      
+      <li><strong>Nom du bâteau :</strong> <%= reservation.boatName %></li>
+    </ul>
+
+    <!-- Lien pour revenir à la liste des réservations-->
+    <a href="/reservations/view">Retour à la liste des réservations</a>
+  </body>
+</html>
