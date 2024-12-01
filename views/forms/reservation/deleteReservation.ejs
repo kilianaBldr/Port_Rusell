@@ -1,0 +1,140 @@
+<div>
+    <h2>Supprimer la réservation</h2>
+    <!-- Formulaire pour supprimer une réservation -->
+    <form id="deleteReservationForm">
+      <!-- Menu déroulant pour sélectionner un numéro de catway pour supprimer une réservation-->
+      <label for="catwayIdDelete">
+        Sélectionnez un numéro de Catway pour supprimer la réservation (par identifiant) :
+      </label>
+      <select id="catwayIdDelete" name="catwayIdDelete" required>
+        <option value="" disabled selected>Sélectionnez un Catway</option>
+      </select>
+      <br /><br />
+  
+      <!-- Liste déroulante pour sélectionner une réservation à supprimer -->
+      <label for="reservationId">Sélectionnez une réservation :</label><br />
+      <select id="reservationId" name="reservationId" required disabled>
+        <option value="" disabled selected>Sélectionnez une réservation</option>
+      </select>
+      <br /><br />
+  
+      <!-- Button pour soumettre le formulaire de suppression de la réservation sélectionnée -->
+      <button type="submit" id="deleteButton" disabled>Supprimer la réservation</button>
+    </form>
+  
+    <!-- Zone de message d'erreur-->
+    <div id="errorMessage" style="color: red; display: none;"></div>
+  </div>
+  
+  <script>
+    // Expression de fonction immédiatement invoquée pour gérer la logique de remplissage des listes déroulantes et de soumission de formulaire
+    (async function () {
+      // Fonction permettant de remplir la liste déroulante du Catway
+      async function populateCatwaysSelect() {
+        try {
+          const response = await fetch("/catways");
+          if (!response.ok) throw new Error("Impossible de récupérer les Catways");
+  
+          const catways = await response.json();
+          const catwaySelect = document.getElementById("catwayIdDelete");
+  
+          catwaySelect.innerHTML =
+            '<option value="" disabled selected>Select a Catway</option>';
+  
+          catways.forEach((catway) => {
+            const option = document.createElement("option");
+            option.value = catway._id;
+            option.textContent = catway.catwayNumber;
+            catwaySelect.appendChild(option);
+          });
+  
+          if (catways.length > 0) {
+            await populateReservationsSelect(catways[0]._id);
+          }
+        } catch (error) {
+          console.error("Erreur lors de la récupération des Catways:", error.message);
+          showError("Erreur lors du chargement des Catways: " + error.message);
+        }
+      }
+  
+      //Fonction permettant de renseigner la liste déroulante des réservations en fonction du Catway sélectionné
+      async function populateReservationsSelect(catwayId) {
+        try {
+          const response = await fetch(`/reservations/${catwayId}/reservations`);
+          if (!response.ok) throw new Error("Impossible de récupérer les réservations");
+  
+          const reservations = await response.json();
+          const reservationSelect = document.getElementById("reservationId");
+  
+          reservationSelect.innerHTML =
+            '<option value="" disabled selected>Select a Reservation</option>';
+          reservationSelect.disabled = reservations.length === 0;
+  
+          if (reservations.length === 0) {
+            const noReservationsOption = document.createElement("option");
+            noReservationsOption.textContent = "Aucune réservation disponible";
+            reservationSelect.appendChild(noReservationsOption);
+          } else {
+            reservations.forEach((reservation) => {
+              const option = document.createElement("option");
+              option.value = reservation._id;
+              option.textContent = `ID: ${reservation._id}`;
+              reservationSelect.appendChild(option);
+            });
+          }
+  
+          // Activer le bouton de suppression si une réservation existe
+          document.getElementById("deleteButton").disabled = !reservations.length;
+        } catch (error) {
+          console.error("Erreur lors de la récupération des réservations :", error.message);
+          showError("Erreur lors du chargement des réservations : " + error.message);
+        }
+      }
+  
+      // Affiche un message d'erreur à l'utilisateur
+      function showError(message) {
+        const errorMessageDiv = document.getElementById("errorMessage");
+        errorMessageDiv.textContent = message;
+        errorMessageDiv.style.display = "block";
+      }
+  
+     // Écouteur d'événements pour gérer la soumission du formulaire
+      document
+        .getElementById("deleteReservationForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+  
+          const catwayId = document.getElementById("catwayIdDelete").value;
+          const reservationId = document.getElementById("reservationId").value;
+  
+          try {
+            const response = await fetch(
+              `/reservations/${catwayId}/reservations/${reservationId}`,
+              { method: "DELETE" }
+            );
+  
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || "Impossible de supprimer la réservation");
+            }
+  
+            alert("Réservation supprimée avec succès");
+            document.getElementById("deleteReservationForm").reset();
+            window.location.reload();
+          } catch (error) {
+            showError("Erreur lors de la suppression de la réservation : " + error.message);
+          }
+        });
+  
+      // Écouteur d'événements pour mettre à jour la liste déroulante des réservations lorsque la sélection de Catway change
+      document
+        .getElementById("catwayIdDelete")
+        .addEventListener("change", async function (event) {
+          const catwayId = event.target.value;
+          await populateReservationsSelect(catwayId);
+        });
+  
+      // Appelez la fonction pour remplir la liste déroulante du catway lors du chargement de la page
+      await populateCatwaysSelect();
+    })();
+  </script>

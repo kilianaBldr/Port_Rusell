@@ -1,0 +1,121 @@
+<div>
+    <h2>Catway Détails</h2>
+    <!-- Liste déroulante pour sélectionner un Catway -->
+    <select id="catwaySelector" onchange="fetchCatwayDetails()">
+      <option value="">Sélectionnez un Catway</option>
+    </select>
+  
+   <!-- Zone de message pour les erreurs ou l'état de chargement -->
+    <div id="loadingMessage" style="color: blue; margin-top: 10px;"></div>
+    <div id="errorMessage" style="color: red; margin-top: 10px;"></div>
+  
+   <!-- div pour afficher les détails du Catway sélectionnée -->
+    <div id="catwayDetails" style="margin-top: 20px;"></div>
+  </div>
+  
+  <script>
+    /**
+    * Récupère les détails du Catway sélectionnée et les affiche.
+    */
+    async function fetchCatwayDetails() {
+      const catwayId = document.getElementById("catwaySelector").value;
+      if (!catwayId) return; // Si aucun Catway n'est sélectionnée, quittez la fonction
+  
+      showLoadingMessage("Chargement des détails du Catway..."); // Afficher le message de chargement
+  
+      try {
+        // Envoi d'une requête GET pour récupérer les détails du catway par ID
+        const response = await fetch(`/catways/detail/${catwayId}`);
+        if (!response.ok) {
+          throw new Error("Impossible de récupérer les détails de Catway");
+        }
+        // Parsing the JSON response
+        const catway = await response.json();
+        // Displaying the catway details
+        displayCatwayDetails(catway);
+      } catch (error) {
+        // Logging and displaying errors
+        console.error("Erreur lors de la récupération des détails de Catway:", error.message);
+        showError("Erreur lors de la récupération des détails de Catway: " + error.message);
+      }
+    }
+  
+    /**
+     * Affiche les détails du Catway dans la section désignée.
+     * @param {Object} catway - L'objet catway contenant des détails.
+     */
+    function displayCatwayDetails(catway) {
+      const detailsSection = document.getElementById("catwayDetails");
+      detailsSection.innerHTML = `
+        <p><strong>Catway Number:</strong> ${catway.catwayNumber}</p>
+        <p><strong>Catway State:</strong> ${catway.catwayState}</p>
+        <p><strong>Type:</strong> ${catway.type ? "Long" : "Short"}</p>
+        <p><strong>Created At:</strong> ${new Date(catway.createdAt).toLocaleString()}</p>
+        <p><strong>Updated At:</strong> ${new Date(catway.updatedAt).toLocaleString()}</p>
+      `;
+      hideLoadingMessage(); // Masquer le message de chargement
+    }
+  
+    /**
+    * Récupère les numéros de Catway et remplit le menu déroulant.
+    */
+    async function fetchCatwayOptions() {
+      try {
+       // Envoi d'une requête GET pour récupérer tous les numéros de Catways
+        const response = await fetch("/catways/catwayNumbers");
+        if (!response.ok) {
+          throw new Error("Impossible de récupérer les numéros Catway");
+        }
+        // Analyse de la réponse JSON
+        const catwayNumbers = await response.json();
+        const selector = document.getElementById("catwaySelector");
+  
+       // Effacer les options existantes
+        selector.innerHTML = '<option value="">Select a Catway</option>';
+  
+        // Si aucun catway n'est disponible, afficher un message informatif
+        if (catwayNumbers.length === 0) {
+          showError("Aucun Catway de disponible.");
+          selector.disabled = true; // Désactiver la liste déroulante si aucune option n'est disponible
+          return;
+        } else {
+          selector.disabled = false; // Activer la liste déroulante si des options sont disponibless
+        }
+  
+        // Ajout d'une option pour chaque numéro de catway
+        catwayNumbers.forEach((catway) => {
+          const option = document.createElement("option");
+          option.value = catway._id;
+          option.textContent = catway.catwayNumber;
+          selector.appendChild(option);
+        });
+  
+        showLoadingMessage("");// Efface tous les messages de chargement précédents
+      } catch (error) {
+        // Enregistrement et alerte de toute erreur qui se produit
+        console.error("Erreur lors de la récupération des numéros Catway:", error.message);
+        showError("Erreur lors de la récupération des numéros Catway: " + error.message);
+      }
+    }
+  
+   // Récupére les numéros du Catway lorsque la page se charge
+    fetchCatwayOptions();
+  
+    // Fonction pour afficher le message de chargement
+    function showLoadingMessage(message) {
+      const loadingMessage = document.getElementById("loadingMessage");
+      loadingMessage.textContent = message;
+    }
+  
+    // Fonction pour afficher un message d'erreur
+    function showError(message) {
+      const errorMessage = document.getElementById("errorMessage");
+      errorMessage.textContent = message;
+    }
+  
+    // Fonction pour masquer le message de chargement
+    function hideLoadingMessage() {
+      const loadingMessage = document.getElementById("loadingMessage");
+      loadingMessage.textContent = "";
+    }
+  </script>

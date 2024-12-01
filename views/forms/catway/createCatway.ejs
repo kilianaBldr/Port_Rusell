@@ -1,0 +1,105 @@
+<div>
+    <h2>Ajouter un nouveau Catway</h2>
+    <!-- Formulaire pour ajouter une nouveau Catway -->
+    <form id="addCatwayForm">
+      <label for="addCatwayNumber">Catway Numéro:</label>
+      <input type="text" id="addCatwayNumber" name="addCatwayNumber" required />
+      <br /><br />
+  
+      <label for="addCatwayState">Catway State:</label>
+      <input type="text" id="addCatwayState" name="addCatwayState" required />
+      <br /><br />
+  
+      <!-- Liste déroulante pour le type de Catway -->
+      <label for="addType">Type:</label>
+      <select id="addType" name="addType" required>
+        <option value="" disabled selected>Selectionné le type</option>
+        <option value="true">Long</option>
+        <option value="false">Short</option>
+      </select>
+      <br /><br />
+  
+      <button type="submit" id="submitButton">Ajouter Catway</button>
+    </form>
+  
+    <div id="messageArea" style="margin-top: 20px; color: green;"></div>
+    <div id="errorMessageArea" style="margin-top: 20px; color: red;"></div>
+  </div>
+  
+  <script>
+    /**
+    * Gère la soumission du formulaire pour l'ajout d'un nouveau catway.
+    * Empêche le comportement de soumission de formulaire par défaut, envoie une requête POST,
+    * et gère la réponse.
+    */
+    document.getElementById("addCatwayForm").addEventListener("submit", async function (event) {
+      event.preventDefault();// Empêche la soumission du formulaire par défaut
+  
+     // Récupérer les valeurs des champs du formulaire
+      const catwayNumber = document.getElementById("addCatwayNumber").value.trim();
+      const catwayState = document.getElementById("addCatwayState").value.trim();
+      const type = document.getElementById("addType").value;
+  
+      // Validation de base côté client
+      if (!catwayNumber || !catwayState || !type) {
+        showError("Tous les champs sont obligatoires.");
+        return;
+      }
+  
+      try {
+        // Envoyer une requête POST pour ajouter une nouveau Catway
+        const response = await fetch("/catways", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ catwayNumber, catwayState, type }),
+        });
+  
+        // Vérifie si la réponse a réussi
+        if (response.ok) {
+          const result = await response.json();
+          console.log("Nouveau Catway ajoutée :", result);
+  
+          showSuccess("Catway ajouté avec succès !");
+  
+          // Réinitialiser le formulaire après une soumission réussie
+          document.getElementById("addCatwayForm").reset();
+        } else {
+          // Gérer les erreurs si la réponse n'est pas OK
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Erreur lors de l'ajout du Catway");
+        }
+      } catch (error) {
+        // Enregistre et affiche les erreurs
+        console.error("Error:", error);
+        showError("Error adding catway: " + error.message);
+      }
+    });
+  
+    // Fonction pour afficher un message de réussite
+    function showSuccess(message) {
+      const messageArea = document.getElementById("messageArea");
+      messageArea.textContent = message;
+      messageArea.style.color = "green";
+      document.getElementById("errorMessageArea").textContent = "";// Efface tout message d'erreur précédent
+    }
+  
+    // Fonction pour afficher un message d'erreur
+    function showError(message) {
+      const errorMessageArea = document.getElementById("errorMessageArea");
+      errorMessageArea.textContent = message;
+      errorMessageArea.style.color = "red";
+      document.getElementById("messageArea").textContent = ""; // Efface tout message de réussite précédent
+    }
+  
+    // Désactive le bouton d'envoi si les champs du formulaire sont incomplets
+    document.getElementById("addCatwayForm").addEventListener("input", function () {
+      const catwayNumber = document.getElementById("addCatwayNumber").value.trim();
+      const catwayState = document.getElementById("addCatwayState").value.trim();
+      const type = document.getElementById("addType").value;
+  
+      const submitButton = document.getElementById("submitButton");
+      submitButton.disabled = !catwayNumber || !catwayState || !type;
+    });
+  </script>

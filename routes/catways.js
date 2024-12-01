@@ -3,214 +3,214 @@ const router = express.Router();
 const catway = require("../models/catway");
 const services = require("../services/catway");
 
-// Route to render the view of all catways
+// Route pour rendre la vue de toutes les Catways
 router.get("/view", async (req, res) => {
   try {
-    // Retrieve all catways from the service
+    // Récupérer tous les catways du service
     const result = await services.getAllCatways();
     if (result.error) {
-      console.error("Error in getAllCatways:", result.error);
-      return res.status(500).json({ error: "Internal server error" });
+      console.error("Erreur dans getAllCatways:", result.error);
+      return res.status(500).json({ error: "Erreur interne du serveur" });
     }
-    // Render the catways view template with the retrieved catways
+    // Rendre le modèle de vue des catways avec les catways récupérées
     res.render("catways", { catways: result.data });
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Erreur attendue:", error);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 
-// Route to get the numbers of all catways in JSON
+// Route pour obtenir les numéro de tous les catways en JSON
 router.get("/catwayNumbers", async (req, res) => {
   try {
-    // Retrieve catway numbers from the service
+    // Récuper les numéro de catway à partir du services
     const result = await services.getCatwayNumbers();
     if (result.error) {
-      console.error("Error fetching catway numbers:", result.error);
-      return res.status(500).json({ error: "Error fetching catway numbers" });
+      console.error("Erreur de récupération des numéro catways:", result.error);
+      return res.status(500).json({ error: "Erreur de récupération des numéro catways" });
     }
-    // Send the retrieved catway numbers as JSON
+    // Envoyer les numéro de catway récupérés au format JSON
     res.json(result.data);
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Erreur attendue:", error);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 
-// Route to render the details of a specific catway
+// Route pour accéder aux détails d'un catway spécifique
 router.get("/view/:id", async (req, res) => {
   const catwayId = req.params.id;
 
   try {
-    // Retrieve a specific catway by ID from the service
+    // Récupérer un Catway spécifique par l'ID à patir du service
     const result = await services.getCatwayById(catwayId);
     if (result.error) {
-      if (result.error === "Catway not found") {
-        return res.status(404).json({ error: "Catway not found" });
+      if (result.error === "Catway non trouvé") {
+        return res.status(404).json({ error: "Catway non trouvé" });
       }
-      console.error("Error in getCatwayDetails:", result.error);
-      return res.status(500).json({ error: "Internal server error" });
+      console.error("Erreur dans getCatwayDetails:", result.error);
+      return res.status(500).json({ error: "Erreur interne du serveur" });
     }
-    // Render the catway detail view template with the retrieved catway
+    // Rendre le modele de vue détaillée d'un catway avec le catway récupérer
     res.render("catwayDetail", { catway: result.data });
   } catch (err) {
-    console.error("Unexpected error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Erreur attendue:", err);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 
-// Route to get the details of a specific catway in JSON format
+// Route pour obtenir les details d'un Catway spécifique au format JSON
 router.get("/detail/:id", async (req, res) => {
   const id = req.params.id;
   try {
-    // Retrieve a specific catway by ID from the service
+    // // Récupérer un Catway spécifique par l'ID à partir du service
     const result = await services.getCatwayById(id);
     if (result.error) {
-      if (result.error === "Catway not found") {
-        return res.status(404).json({ error: "Catway not found" });
+      if (result.error === "Catway non trouvé") {
+        return res.status(404).json({ error: "Catway non trouvé" });
       }
-      console.error(`Error fetching catway ${id}:`, result.error);
-      return res.status(500).json({ error: "Error fetching catway details" });
+      console.error(`Erreur lors de la récupération du Catway ${id}:`, result.error);
+      return res.status(500).json({ error: "Erreur lors de la récupération des détails du Catway" });
     }
-    // Send the retrieved catway details as JSON
+    // Envoie les détails récupérés du catway au format JSON
     res.json(result.data);
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Erreur attendue:", error);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 
-// Route to update a specific catway's state
+// Route pour mettre à jour l'état d'un catway spécifique
 router.patch("/:id", async (req, res) => {
   const id = req.params.id;
   const { catwayState } = req.body;
 
   try {
-    // Update the catway's state by ID from the service
+    // mettre à jour l'état du Catway par son ID depuis le service
     const result = await services.patchCatwayById(id, catwayState);
     if (result.error) {
-      if (result.error === "Catway not found") {
-        return res.status(404).json({ error: "Catway not found" });
+      if (result.error === "Catway non trouvé") {
+        return res.status(404).json({ error: "Catway non trouvé" });
       }
-      console.error("Error updating Catway:", result.error);
+      console.error("Erreur lors de la mise à jour de Catway:", result.error);
       return res.status(500).json({ error: "Error updating Catway" });
     }
-    // Send a success response with the updated catway details
+    // envoie une réponse de réussite avec les détails du Catway mis à jour
     res
       .status(200)
-      .json({ message: "Catway updated successfully", catway: result.data });
+      .json({ message: "Catway mis à jour avec succès", catway: result.data });
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Erreur attendue:", error);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 
-// Route to get all catways in JSON format
+// Route pour obtenir tous les catways au format JSON
 router.get("/", async (req, res) => {
   try {
-    // Retrieve all catways from the service
+    // Récupere tous les Catways du service
     const result = await services.getAllCatways();
     if (result.error) {
-      console.error("Error in getAllCatways:", result.error);
-      return res.status(500).json({ error: "Internal server error" });
+      console.error("Erreur dans getAllCatways:", result.error);
+      return res.status(500).json({ error: "Erreur interne du serveur" });
     }
-    // Send the retrieved catways as JSON
+    // Envoie les catways récuperes au format JSON
     res.json(result.data);
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Erreur attendue:", error);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 
-// Route to get a specific catway by ID in JSON format
+// Route pour obtenir un Catway spécifique par ID au format JSON
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
   try {
-    // Retrieve a specific catway by ID from the service
+    // Recupère un Catway spécifique par ID à partir du service
     const result = await services.getCatwayById(id);
     if (result.error) {
-      if (result.error === "Catway not found") {
-        return res.status(404).json({ error: "Catway not found" });
+      if (result.error === "Catway non trouvé") {
+        return res.status(404).json({ error: "Catway non trouvé" });
       }
-      console.error("Error fetching catway:", result.error);
-      return res.status(500).json({ error: "Error fetching catway details" });
+      console.error("Erreur lors de la récupération du Catway:", result.error);
+      return res.status(500).json({ error: "Erreur lors de la récupération des détails du Catway" });
     }
-    // Send the retrieved catway details as JSON
+    // Envoie les détails récupérés du Catway au format JSON
     res.json(result.data);
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Erreur attendue:", error);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 
-// Route to create a new catway
+// Route pour créer un nouveau Catway
 router.post("/", async (req, res) => {
   const { catwayNumber, catwayState, type } = req.body;
   try {
-    // Create a new catway using the service
+    // Créer un nouveau Catway en utilisant le service
     const result = await services.addCatway({
       catwayNumber,
       catwayState,
       type,
     });
     if (result.error) {
-      console.error("Error creating catway:", result.error);
-      return res.status(500).json({ error: "Error creating catway" });
+      console.error("Erreur lors de la création du Catway:", result.error);
+      return res.status(500).json({ error: "Erreur lors de la création du Catway" });
     }
-    // Send a success response with the newly created catway details
+    // Envoie une réponse de validation avec les détails du catway venant d'être créer
     res.status(201).json(result.data);
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Erreur attendue:", error);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 
-// Route to update an existing catway
+// Route pour mettre à jour un Catway existant par son ID en utilisant le service
 router.put("/:id", async (req, res) => {
   const id = req.params.id;
   const { catwayNumber, catwayState, type } = req.body;
 
   try {
-    // Update an existing catway by ID using the service
+    // Mettre à jour un Catway existant par son ID en utilisant le service
     const result = await services.updateCatwayById(id, {
       catwayNumber,
       catwayState,
       type,
     });
     if (result.error) {
-      if (result.error === "Catway not found") {
-        return res.status(404).json({ error: "Catway not found" });
+      if (result.error === "Catway non trouvé") {
+        return res.status(404).json({ error: "Catway non trouvé" });
       }
-      console.error("Error updating catway:", result.error);
-      return res.status(500).json({ error: "Error updating catway" });
+      console.error("Erreur lros de la mise à jour du Catway:", result.error);
+      return res.status(500).json({ error: "Erreur lors de la mise à jour du Catway" });
     }
-    // Send a success response with the updated catway details
+    // Envoie une réponse de validation avec les détails du catway venant d'être mise à jour
     res.status(200).json(result.data);
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Erreur attendue:", error);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 
-// Route to delete a specific catway
+// Route pour supprimer un Catway spécifique
 router.delete("/:id", async (req, res) => {
   const id = req.params.id;
 
   try {
-    // Delete a specific catway by ID using the service layer
+    // Supprimer un Catway spécifique par son ID en utilisant le service
     const result = await services.deleteCatwayById(id);
     if (result.error) {
-      if (result.error === "Catway not found") {
-        return res.status(404).json({ error: "Catway not found" });
+      if (result.error === "Catway non trouvé") {
+        return res.status(404).json({ error: "Catway non trouvé" });
       }
-      console.error("Error deleting catway:", result.error);
-      return res.status(500).json({ error: "Error deleting catway" });
+      console.error("Erreur lors de la suppression du Catway:", result.error);
+      return res.status(500).json({ error: "Erreur lors de la suppression du Catway" });
     }
-    // Send a success response indicating the catway was deleted
-    res.status(200).json({ message: "Catway deleted successfully" });
+    // Envoie une réponse de validation de suppression du catway venant d'être supprimer
+    res.status(200).json({ message: "Catway supprimé avec succès" });
   } catch (error) {
-    console.error("Unexpected error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Erreur attendue:", error);
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
 

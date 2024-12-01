@@ -1,0 +1,139 @@
+<div>
+    <!-- Formulaire pour créer une nouvelle réservation -->
+    <form id="createReservationForm">
+      <!-- Liste déroulante pour sélectionner un numéro de Catway pour la réservation -->
+      <label for="catwayId">Sélectionnez un numéro de Catway pour créer une réservation:</label>
+      <select id="catwayId" name="catwayId" required>
+        <option value="" disabled selected>Sélectionnez un Catway</option>
+      </select>
+      <br /><br />
+  
+      <!-- Input pour le nom du client -->
+      <label for="clientName">Nom du client :</label><br />
+      <input type="text" id="clientName" name="clientName" required />
+      <br /><br />
+  
+      <!-- Input pour la date d'arrivée -->
+      <label for="checking">Date d'arrivée:</label><br />
+      <input type="date" id="checking" name="checking" required />
+      <br /><br />
+  
+      <!-- Input pour la date de départ -->
+      <label for="checkout">Date de départ :</label><br />
+      <input type="date" id="checkout" name="checkout" required />
+      <br /><br />
+  
+      <!-- Input pour le nom du bateau -->
+      <label for="boatName">Nom du bâteaux:</label><br />
+      <input type="text" id="boatName" name="boatName" required />
+      <br /><br />
+  
+      <!-- Button pour soumettre le formulaire et enregistrer la réservation -->
+      <button type="submit" id="submitBtn" disabled>Enregistrer la réservation</button>
+    </form>
+    <!-- Zone de message d'erreur -->
+    <div id="errorMessage" style="color: red; display: none;"></div>
+  </div>
+  
+  <script>
+    // Fonction permettant de remplir la liste déroulante de sélection de Catway
+    async function populateCatwaysSelect() {
+      try {
+        const response = await fetch("/catways");
+        if (!response.ok) {
+          throw new Error("Impossible de récupérer les Catways");
+        }
+  
+        const catways = await response.json();
+        const catwaySelect = document.getElementById("catwayId");
+  
+        catwaySelect.innerHTML = '<option value="" disabled selected>Select a Catway</option>';
+  
+        catways.forEach((catway) => {
+          const option = document.createElement("option");
+          option.value = catway._id;
+          option.textContent = catway.catwayNumber;
+          catwaySelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Erreur lors de la récupération des Catways:", error.message);
+        alert("Erreur lors du chargement des Catways : " + error.message);
+      }
+    }
+  
+   // Appelez la fonction pour remplir la liste déroulante de sélection de Catway lorsque la page se charge
+    populateCatwaysSelect();
+  
+    // Activer le bouton d'envoi uniquement lorsque tous les champs obligatoires sont remplis
+    document.getElementById("createReservationForm").addEventListener("input", function () {
+      const clientName = document.getElementById("clientName").value;
+      const checking = document.getElementById("checking").value;
+      const checkout = document.getElementById("checkout").value;
+      const boatName = document.getElementById("boatName").value;
+      const catwayId = document.getElementById("catwayId").value;
+      
+      const submitButton = document.getElementById("submitBtn");
+      if (clientName && checking && checkout && boatName && catwayId) {
+        submitButton.disabled = false;
+      } else {
+        submitButton.disabled = true;
+      }
+    });
+  
+    // Valide les dates
+    function validateDates() {
+      const checking = document.getElementById("checking").value;
+      const checkout = document.getElementById("checkout").value;
+  
+      if (new Date(checkout) <= new Date(checking)) {
+        document.getElementById("errorMessage").textContent = "La date de départ doit être postérieure à la date d'arrivée.";
+        document.getElementById("errorMessage").style.display = "block";
+        return false;
+      }
+      document.getElementById("errorMessage").style.display = "none";
+      return true;
+    }
+  
+    // Ajoute un écouteur d'événements pour gérer la soumission du formulaire
+    document
+      .getElementById("createReservationForm")
+      .addEventListener("submit", async function (event) {
+        event.preventDefault();
+  
+        if (!validateDates()) return;
+  
+        const clientName = document.getElementById("clientName").value;
+        const checking = document.getElementById("checking").value;
+        const checkout = document.getElementById("checkout").value;
+        const boatName = document.getElementById("boatName").value;
+        const catwayId = document.getElementById("catwayId").value;
+  
+        try {
+          const response = await fetch(`/reservations/${catwayId}/reservations`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ clientName, checking, checkout, boatName }),
+          });
+  
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Impossible d'enregistrer la réservation");
+          }
+  
+          const result = await response.json();
+          alert("Réservation enregistrée avec succès");
+  
+          // Réinitialise le formulaire
+          document.getElementById("createReservationForm").reset();
+          document.getElementById("submitBtn").disabled = true;
+  
+          // Recharger la page pour montrer les modifications
+          window.location.reload();
+        } catch (error) {
+          console.error("Erreur lors de l'enregistrement de la réservation:", error.message);
+          alert("Erreur lors de l'enregistrement de la réservation: " + error.message);
+        }
+      });
+  </script>

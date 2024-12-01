@@ -1,0 +1,66 @@
+<div>
+  <h2>Créer un utilisateur</h2>
+
+  <!-- Formulaire d'ajout d'un nouvel utilisateur -->
+  <form id="addUserForm">
+    <label for="newName">Nom:</label>
+    <input type="text" id="newName" name="name" required />
+    <br /><br />
+
+    <label for="newEmail">Email:</label>
+    <input type="email" id="newEmail" name="email" required />
+    <br /><br />
+
+    <label for="newPassword">Mot de passe:</label>
+    <input type="password" id="newPassword" name="password" required minlength="6" />
+    <br /><br />
+
+    <button type="submit" id="submitButton">Ajouter un utilisateur</button>
+  </form>
+</div>
+
+<script>
+  // Ajouter un écouteur d'événement pour l'événement de soumission du formulaire
+  document
+    .getElementById("addUserForm")
+    .addEventListener("submit", async function (event) {
+      event.preventDefault(); // Empêche le comportement de soumission de formulaire par défaut
+
+      // Récupére les valeurs des champs du formulaire
+      const name = document.getElementById("newName").value.trim();
+      const email = document.getElementById("newEmail").value.trim();
+      const password = document.getElementById("newPassword").value;
+
+      // Désactive le bouton d'envoi pour éviter les envois multiples
+      const submitButton = document.getElementById("submitButton");
+      submitButton.disabled = true;
+
+      try {
+        // Envoye une requête POST pour ajouter un nouvel utilisateur
+        const response = await fetch("/users/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, password }),
+        });
+
+        if (response.ok) {
+          const newUser = await response.json(); // Analyser la réponse JSON
+          console.log("Nouvel utilisateur ajouté :", newUser);
+          alert("Utilisateur ajouté avec succès !");
+          window.location.reload(); // Recharge la page pour refléter les modifications
+        } else {
+          // Extraire le message d'erreur de la réponse
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Erreur lors de l'ajout d'un utilisateur");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert(`Erreur lors de l'ajout de l'utilisateur: ${error.message}`);
+      } finally {
+        // Réactive le bouton d'envoi une fois la demande terminée
+        submitButton.disabled = false;
+      }
+    });
+</script>

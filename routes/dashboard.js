@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
 const catway = require('../models/catway');
@@ -9,8 +9,8 @@ router.get('/', private.checkJWT, async (req, res) => {
         const catways = await catway.find();
         res.render('dashboard', {catways});
     } catch (error) {
-        console.error('Error fetching catways:', error);
-        res.status(500).json({error: 'internal server error'});
+        console.error('Erreur lors de la récupération des Catways:', error);
+        res.status(500).json({error: 'Erreur interne du serveur'});
     }
 });
 
