@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/user.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/user.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const User = require("../models/user");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { SECRET_KEY } = process.env;
+
+/**
+ * Obtenez tous les utilisateurs, à l'exclusion de leurs mots de passe.
+ * @returns {Promise&lt;Array>} - 
+ * Une promesse qui se résout en un tableau d’objets utilisateur.
+ */
+exports.getAllUsers = async () => {
+  try {
+    return await User.find({}, "-password");
+  } catch (error) {
+    console.error("Erreur dans getAllUsers:", error);
+    throw new Error("Erreur lors de la récupération des utilisateurs");
+  }
+};
+
+/**
+ * Obtenir un utilisateur par son identifiant.
+ * @param {string} id - L'ID de l'utilisateur.
+ * @returns {Promise&lt;Object|null>} - 
+ * Une promesse qui se résout en objet utilisateur ou null si elle n'est pas trouvée.
+ */
+exports.getUserById = async (id) => {
+  try {
+    return await User.findById(id);
+  } catch (error) {
+    console.error("Erreur dans getUserById:", error);
+    throw new Error("Erreur lors de la récupération de l'utilisateur");
+  }
+};
+
+/**
+ * Créer un nouvel utilisateur.
+ * @param {Object} userData -Les données du nouvel utilisateur.
+ * @returns {Promise&lt;Object>} - 
+ * Une promesse qui se résout en l’objet utilisateur créé.
+ */
+exports.addUser = async (userData) => {
+
+  try {
+    return await User.create(userData);
+  } catch (error) {
+
+    console.error("Erreur dans addUser:", error);
+    // Gestion d'erreur spécifique pour la validation de Mongoose
+    if (error.name === 'ValidationError') {
+      throw new Error(`Erreur de validation : ${Object.values(error.errors).map(e => e.message).join(', ')}`);
+    }
+    // Gestion d'erreur de duplication (par ex. email déjà utilisé)
+    if (error.code === 11000) {
+
+      throw new Error("Cet email existe déjà dans notre base de données.");
+    }
+    // Erreur générique pour les autres cas
+    throw new Error("Erreur lors de la création de l'utilisateur");
+  }
+};
+
+/**
+ *Mettre à jour un utilisateur par son ID.
+ * @param {string} id -L'ID de l'utilisateur.
+ * @param {Object} userData - Les données mises à jour pour l'utilisateur.
+ * @returns {Promise&lt;Object>} - 
+ * Les données mises à jour pour l'utilisateur.
+ */
+exports.updateUserById = async (id, userData) => {
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      throw new Error("Utilisateur non trouvé");
+    }
+
+    Object.keys(userData).forEach((key) => {
+      if (userData[key]) {
+        user[key] = userData[key];
+      }
+    });
+
+    await user.save();
+    return user;
+  } catch (error) {
+    console.error("Erreur dans updateUserById:", error);
+    throw error;
+  }
+};
+
+/**
+ *Supprimer un utilisateur par son ID.
+ * @param {string} id -L'ID de l'utilisateur.
+ * @returns {Promise&lt;Object>} - 
+ *Une promesse qui se résout en un message confirmant la suppression.
+ */
+exports.deleteUserById = async (id) => {
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      throw new Error("Utilisateur non trouvé");
+    }
+    await User.deleteOne({ _id: id });
+    return { message: "L'utilisateur a été supprimé avec succès" };
+  } catch (error) {
+    console.error("Erreur dans deleteUserById:", error);
+    throw error;
+  }
+};
+
+/**
+ * Authentifier un utilisateur par son email et son mot de passe.
+ * @param {string} email - L'adresse e-mail de l'utilisateur.
+ * @param {string} password - le mot de passe de l'utilisateur.
+ * @returns {Promise&lt;Object>} - 
+ *Une promesse qui se résout en un objet contenant un jeton JWT.
+ */
+exports.authenticateUser = async (email, password) => {
+  try {
+    const user = await User.findOne({ email }).select(
+      "-__v -createdAt -updatedAt"
+    );
+    if (!user) {
+      throw new Error("Utilisateur non trouvé");
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      throw new Error("Mauvaises informations d'identification");
+    }
+
+    const { password: userPassword, ...userWithoutPassword } = user.toObject();
+    const expiresIn = 24 * 60 * 60;
+    const token = jwt.sign({ user: userWithoutPassword }, SECRET_KEY, {
+      expiresIn,
+    });
+
+    return { token };
+  } catch (error) {
+    console.error("Erreur d'authentification :", error);
+    throw error;
+  }
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addCatway">addCatway</a></li><li><a href="global.html#addUser">addUser</a></li><li><a href="global.html#authenticateUser">authenticateUser</a></li><li><a href="global.html#checkJWT">checkJWT</a></li><li><a href="global.html#createReservation">createReservation</a></li><li><a href="global.html#deleteCatwayById">deleteCatwayById</a></li><li><a href="global.html#deleteResByCatwayAndId">deleteResByCatwayAndId</a></li><li><a href="global.html#deleteUserById">deleteUserById</a></li><li><a href="global.html#getAllCatways">getAllCatways</a></li><li><a href="global.html#getAllUsers">getAllUsers</a></li><li><a href="global.html#getCatwayById">getCatwayById</a></li><li><a href="global.html#getCatwayNumbers">getCatwayNumbers</a></li><li><a href="global.html#getResByCatwayAndId">getResByCatwayAndId</a></li><li><a href="global.html#getResByCatwayId">getResByCatwayId</a></li><li><a href="global.html#getUserById">getUserById</a></li><li><a href="global.html#patchCatwayById">patchCatwayById</a></li><li><a href="global.html#updateCatwayById">updateCatwayById</a></li><li><a href="global.html#updateUserById">updateUserById</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Dec 04 2024 13:41:13 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
