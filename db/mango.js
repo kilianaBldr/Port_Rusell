@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const clientOptions = {
-
     dbName            : 'apinode'
 };
 

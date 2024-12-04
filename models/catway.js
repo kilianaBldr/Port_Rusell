@@ -9,8 +9,7 @@ const catwayShema = new Schema({
         unique: true 
     },
     type: { 
-        type: String, 
-        enum: ['long', 'short'], 
+        type: Boolean, 
         required: [true, 'Le type est requis'] 
     },
     catwayState: { 

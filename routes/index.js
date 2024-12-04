@@ -9,11 +9,11 @@ const reservationRouter = require("./reservations");
 const private = require("../middlewares/private");
 
 /* GET home page. */
-router.get("/", function(req, res) {
+router.get("/", (req, res) => {
   res.render("index");
 });
 
-router.use("/dashboard", dashboardRouter);
+router.use("/dashboard",private.checkJWT, dashboardRouter);
 router.use("/users", userRouter);
 router.use("/catways",private.checkJWT, catwaysRouter);
 router.use("/reservation", private.checkJWT, reservationRouter);

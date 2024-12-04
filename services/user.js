@@ -39,10 +39,22 @@ exports.getUserById = async (id) => {
  * Une promesse qui se résout en l’objet utilisateur créé.
  */
 exports.addUser = async (userData) => {
+
   try {
     return await User.create(userData);
   } catch (error) {
+
     console.error("Erreur dans addUser:", error);
+    // Gestion d'erreur spécifique pour la validation de Mongoose
+    if (error.name === 'ValidationError') {
+      throw new Error(`Erreur de validation : ${Object.values(error.errors).map(e => e.message).join(', ')}`);
+    }
+    // Gestion d'erreur de duplication (par ex. email déjà utilisé)
+    if (error.code === 11000) {
+
+      throw new Error("Cet email existe déjà dans notre base de données.");
+    }
+    // Erreur générique pour les autres cas
     throw new Error("Erreur lors de la création de l'utilisateur");
   }
 };

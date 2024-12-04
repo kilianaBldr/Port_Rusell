@@ -14,13 +14,13 @@
       <br /><br />
   
       <!-- Input pour la date d'arrivée -->
-      <label for="checking">Date d'arrivée:</label><br />
-      <input type="date" id="checking" name="checking" required />
+      <label for="checkIn">Date d'arrivée:</label><br />
+      <input type="date" id="checkIn" name="checkIn" required />
       <br /><br />
   
       <!-- Input pour la date de départ -->
-      <label for="checkout">Date de départ :</label><br />
-      <input type="date" id="checkout" name="checkout" required />
+      <label for="CheckOut">Date de départ :</label><br />
+      <input type="date" id="CheckOut" name="CheckOut" required />
       <br /><br />
   
       <!-- Input pour le nom du bateau -->
@@ -67,13 +67,13 @@
     // Activer le bouton d'envoi uniquement lorsque tous les champs obligatoires sont remplis
     document.getElementById("createReservationForm").addEventListener("input", function () {
       const clientName = document.getElementById("clientName").value;
-      const checking = document.getElementById("checking").value;
-      const checkout = document.getElementById("checkout").value;
+      const checkIn = document.getElementById("checkIn").value;
+      const CheckOut = document.getElementById("CheckOut").value;
       const boatName = document.getElementById("boatName").value;
       const catwayId = document.getElementById("catwayId").value;
       
       const submitButton = document.getElementById("submitBtn");
-      if (clientName && checking && checkout && boatName && catwayId) {
+      if (clientName && checkIn && CheckOut && boatName && catwayId) {
         submitButton.disabled = false;
       } else {
         submitButton.disabled = true;
@@ -82,10 +82,10 @@
   
     // Valide les dates
     function validateDates() {
-      const checking = document.getElementById("checking").value;
-      const checkout = document.getElementById("checkout").value;
+      const checkIn = document.getElementById("checkIn").value;
+      const CheckOut = document.getElementById("CheckOut").value;
   
-      if (new Date(checkout) <= new Date(checking)) {
+      if (new Date(CheckOut) <= new Date(checkIn)) {
         document.getElementById("errorMessage").textContent = "La date de départ doit être postérieure à la date d'arrivée.";
         document.getElementById("errorMessage").style.display = "block";
         return false;
@@ -103,8 +103,8 @@
         if (!validateDates()) return;
   
         const clientName = document.getElementById("clientName").value;
-        const checking = document.getElementById("checking").value;
-        const checkout = document.getElementById("checkout").value;
+        const checkIn = document.getElementById("checkIn").value;
+        const CheckOut = document.getElementById("CheckOut").value;
         const boatName = document.getElementById("boatName").value;
         const catwayId = document.getElementById("catwayId").value;
   
@@ -114,7 +114,7 @@
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ clientName, checking, checkout, boatName }),
+            body: JSON.stringify({ clientName, checkIn, CheckOut, boatName }),
           });
   
           if (!response.ok) {

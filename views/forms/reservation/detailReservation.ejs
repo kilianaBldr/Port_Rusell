@@ -81,8 +81,8 @@
           const detailsContainer = document.getElementById("reservationDetails");
   
           //Formate les dates pour plus de lisibilité
-          const checkingDate = new Date(reservation.checking).toLocaleDateString("en-GB");
-          const checkoutDate = new Date(reservation.checkout).toLocaleDateString("en-GB");
+          const checkInDate = new Date(reservation.checkIn).toLocaleDateString("fr-FR");
+          const CheckOutDate = new Date(reservation.CheckOut).toLocaleDateString("fr-FR");
   
           // Génére du HTML pour afficher les détails de la réservation
           const detailsHTML = `
@@ -90,8 +90,8 @@
             <table>
               <tr><td><strong>ID:</strong></td><td>${reservation._id}</td></tr>
               <tr><td><strong>Client:</strong></td><td>${reservation.clientName}</td></tr>
-              <tr><td><strong>Date d'arrivée:</strong></td><td>${checkingDate}</td></tr>
-              <tr><td><strong>Date de départ:</strong></td><td>${checkoutDate}</td></tr>
+              <tr><td><strong>Date d'arrivée:</strong></td><td>${checkInDate}</td></tr>
+              <tr><td><strong>Date de départ:</strong></td><td>${CheckOutDate}</td></tr>
               <tr><td><strong>Nom du bateau:</strong></td><td>${reservation.boatName}</td></tr>
             </table>
           `;
