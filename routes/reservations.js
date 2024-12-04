@@ -95,15 +95,15 @@ router.get(
 // Route pour créer un nouvelle réservation pour un Catway spécifique
 router.post("/:id/reservations", private.checkJWT, async (req, res) => {
   const catwayId = req.params.id;
-  const { clientName, checking, checkout, boatName } = req.body;
+  const { clientName, checkIn, CheckOut, boatName } = req.body;
 
   try {
     // Créer une nouvelle réservation en utilsant le service
     const newReservation = await reservationService.createReservation(
       catwayId,
       clientName,
-      checking,
-      checkout,
+      checkIn,
+      CheckOut,
       boatName
     );
     // Envoye la nouvelle réservation qui vien d'être créer au format JSON

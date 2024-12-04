@@ -34,7 +34,7 @@ app.use((req, res) => {
         name: 'API',
         version: '1.0',
         status: 404,
-        message: 'not_found',
+        message: 'non_trouvé',
     });
 });
 

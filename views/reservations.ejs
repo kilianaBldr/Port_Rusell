@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,7 +9,7 @@
   <body>
     <h1>
       Réservations pour Catway
-      <%= reservations.length > 0 ? reservations[0].catwayNumber : 'N/A' %>
+      <%= reservations.length > 0 ? reservations[0].catwayNumber : '' %>
     </h1>
 
     <!-- Vérification si la liste des réservations est vide -->
@@ -19,8 +19,8 @@
       <% reservations.forEach(reservation => { %>
       <ul>
         <li><strong>Client:</strong> <%= reservation.clientName %></li>
-        <li><strong>Date d'arrivée:</strong> <%= new Date(reservation.checking).toLocaleDateString() %></li>
-        <li><strong>Date de départ:</strong> <%= new Date(reservation.checkout).toLocaleDateString() %></li>
+        <li><strong>Date d'arrivée:</strong> <%= new Date(reservation.checkIn).toLocaleDateString() %></li>
+        <li><strong>Date de départ:</strong> <%= new Date(reservation.CheckOut).toLocaleDateString() %></li>
         <li><strong>bâteau:</strong> <%= reservation.boatName %></li>
         <li><a href="/reservations/view/<%= reservation._id %>">Voir les détails</a></li>
       </ul>

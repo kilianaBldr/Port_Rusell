@@ -19,13 +19,13 @@
       <!-- Formate et affiche la date d'arrivée -->
       <li>
         <strong>Date d'arrivée:</strong> 
-        <%= reservation.checking ? new Date(reservation.checking).toLocaleDateString() : 'Pas disponible' %>
+        <%= reservation.checkIn ? new Date(reservation.checkIn).toLocaleDateString() : 'Pas disponible' %>
       </li>
       
       <!-- Formate et affiche la date de départ-->
       <li>
         <strong>Date de départ :</strong> 
-        <%= reservation.checkout ? new Date(reservation.checkout).toLocaleDateString() : 'Pas disponible' %>
+        <%= reservation.CheckOut ? new Date(reservation.CheckOut).toLocaleDateString() : 'Pas disponible' %>
       </li>
       
       <li><strong>Nom du bâteau :</strong> <%= reservation.boatName %></li>

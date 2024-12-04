@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 //Shéma pour la collection reservation
 const reservationShema = new Schema({
-    catwayNumber: { 
+    catwayId: { 
         type: Schema.Types.ObjectId,
         ref: "Catway",
         required: [true]

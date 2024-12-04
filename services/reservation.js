@@ -40,8 +40,8 @@ exports.getResByCatwayAndId = async (catwayId, reservationId) => {
  * Créez une nouvelle réservation pour un Catway spécifique.
  * @param {string} catwayId - L'ID du Catway .
  * @param {string} clientName - The name of the client.
- * @param {Date} checking - La date d'arrivée.
- * @param {Date} checkout - La date de départ.
+ * @param {Date} checkIn - La date d'arrivée.
+ * @param {Date} checkOut - La date de départ.
  * @param {string} boatName - Le nom du bateau du client.
  * @returns {Promise<Object>} - 
  * Une promesse qui se résout à la réservation nouvellement créée.
@@ -49,16 +49,16 @@ exports.getResByCatwayAndId = async (catwayId, reservationId) => {
 exports.createReservation = async (
   catwayId,
   clientName,
-  checking,
-  checkout,
+  checkIn,
+  checkOut,
   boatName
 ) => {
   try {
     const newReservation = new Reservation({
       catwayId,
       clientName,
-      checking,
-      checkout,
+      checkIn,
+      checkOut,
       boatName,
     });
     await newReservation.save();
