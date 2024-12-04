@@ -6,6 +6,8 @@ const cors = require('cors')
 
 const indexRouter = require('./routes/index');
 const mangodb = require('./db/mango');
+//Déclaration de docsPath
+const docsPath = path.join(__dirname, 'docs');
 
 mangodb.initClientDbConnection();
 
@@ -26,6 +28,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+//Sert la documentation avec Express
+app.use('/docs', express.static(docsPath))
 
 app.use('/', indexRouter);
 
