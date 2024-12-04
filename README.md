@@ -2,7 +2,9 @@
 
 ## Vue d'Ensemble
 
-L'API du Port de Plaisance Russell est un service web basé sur l'architecture **RESTful**, conçu pour faciliter la gestion des réservations des **catways** (quais d'amarrage pour bateaux) au sein de la marina de Russell. Cette API propose des fonctionnalités pour créer, récupérer, modifier et supprimer des catways ainsi que des réservations. L'accès à l'API est sécurisé, permettant aux utilisateurs de gérer efficacement leurs ressources.
+L'API du Port de Plaisance Russell est un service web basé sur l'architecture **RESTful**, conçu pour faciliter la gestion des réservations des **catways** (quais d'amarrage pour bateaux) au sein de la marina de Russell.
+Cette API propose des fonctionnalités pour créer, récupérer, modifier et supprimer des catways ainsi que des réservations.
+L'accès à l'API est sécurisé, permettant aux utilisateurs de gérer efficacement leurs ressources.
 
 ---
 
@@ -34,7 +36,8 @@ La marina de Russell souhaite automatiser la gestion des réservations de catway
 
 ## Points de Terminaison de l'API
 
-L'API est conçue selon les principes RESTful, ce qui signifie que les ressources sont identifiées par des URLs et manipulées par des méthodes HTTP appropriées (GET, POST, PUT, DELETE). Voici un aperçu des principaux points de terminaison de l'API.
+L'API est conçue selon les principes RESTful, ce qui signifie que les ressources sont identifiées par des URLs et manipulées par des méthodes HTTP appropriées (GET, POST, PUT, DELETE). 
+Voici un aperçu des principaux points de terminaison de l'API.
 
 ### Catways
 
@@ -96,7 +99,7 @@ Voici les étapes pour installer et démarrer l'API :
 
 ```bash
 # Clonez le repository du projet
-
+git clone https://github.com/kilianaBldr/Port_Rusell.git
 
 # Allez dans le répertoire du projet
 cd portRusell
