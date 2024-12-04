@@ -102,7 +102,7 @@ Voici les étapes pour installer et démarrer l'API :
 git clone https://github.com/kilianaBldr/Port_Rusell.git
 
 # Allez dans le répertoire du projet
-cd portRusell
+cd Port_Rusell
 
 # Installez les dépendances nécessaires
 npm install
